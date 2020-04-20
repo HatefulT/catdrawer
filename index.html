@@ -1,0 +1,68 @@
+<style> * { margin: 0; } canvas { border: 2px solid black; } </style>
+<h1 id="loading">Загрузка</h1>
+<div id="ready" style="display: none">
+  <h1>Готово</h1>
+  <button type="button" name="button" onclick="drawNew()">NEW</button>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.10.2/p5.min.js"></script>
+<script src="https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script>
+<script>
+
+var loadingEl,
+    readyEl;
+
+var sketchrnn;
+
+var x, y, nextPen, currentSketch = null;
+
+var setup = function() {
+  sketchrnn = ml5.sketchRNN('cat', modelReady);
+  createCanvas(500, 500);
+  x = 250;
+  y = 250;
+
+  loadingEl = document.getElementById('loading');
+  readyEl = document.getElementById('ready');
+}
+
+var modelReady = function() {
+  loadingEl.style.display = "none";
+  readyEl.style.display = "block";
+}
+
+var drawNew = function() {
+  background(255);
+  nextPen = null;
+  sketchrnn.reset();
+  x = 250; y = 250;
+  sketchrnn.generate(gotSketch);
+}
+
+var gotSketch = function(e, r) {
+  currentSketch = r;
+  // console.log(r);
+}
+
+var draw = function() {
+  stroke(0);
+  if(currentSketch) {
+    var nx = x + currentSketch.dx,
+        ny = y + currentSketch.dy;
+    if(nextPen === 'down') {
+      line(x, y, nx, ny);
+    }
+
+    x = nx;
+    y = ny;
+
+    nextPen = currentSketch.pen;
+    if(nextPen === 'end') {
+      // noLoop();
+      return;
+    }
+    currentSketch = null;
+    sketchrnn.generate(gotSketch);
+  }
+}
+
+</script>
