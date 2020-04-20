@@ -1,8 +1,11 @@
 <style> * { margin: 0; } canvas { border: 2px solid black; } </style>
-<h1 id="loading">Загрузка</h1>
+<h1 id="loading">Загрузка..</h1>
 <div id="ready" style="display: none">
-  <h1>Готово</h1>
+  <h1>Готово!</h1>
   <button type="button" name="button" onclick="drawNew()">NEW</button>
+</div>
+<div id="drawing" style="display: none">
+  <h1>Рисую..</h1>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.10.2/p5.min.js"></script>
 <script src="https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script>
@@ -23,6 +26,7 @@ var setup = function() {
 
   loadingEl = document.getElementById('loading');
   readyEl = document.getElementById('ready');
+  drawingEl = document.getElementById('drawing');
 }
 
 var modelReady = function() {
@@ -31,11 +35,15 @@ var modelReady = function() {
 }
 
 var drawNew = function() {
+  // loadingEl.style.display = "none";
+  readyEl.style.display = "none";
+  drawingEl.style.display = 'block';
   background(255);
   nextPen = null;
   sketchrnn.reset();
   x = 250; y = 250;
   sketchrnn.generate(gotSketch);
+
 }
 
 var gotSketch = function(e, r) {
@@ -57,7 +65,9 @@ var draw = function() {
 
     nextPen = currentSketch.pen;
     if(nextPen === 'end') {
-      // noLoop();
+      readyEl.style.display = "block";
+      drawingEl.style.display = "none";
+
       return;
     }
     currentSketch = null;
